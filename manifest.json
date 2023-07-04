@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Handy Tools",
+  "description": "Make your life a bit easier",
+  "version": "0.3.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "coffee-icon.png"
+  },
+  "permissions": ["tabs", "activeTab"],
+  "icons": {
+    "512": "coffee-icon.png"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    },
+    {
+      "js": ["scripts/jira.js"],
+      "matches": ["https://jira.lucky-team.pro/*"]
+    },
+    {
+      "js": ["scripts/domains.js"],
+      "matches": ["https://lt-tracker.pro/cloudflare/domains*"]
+    }
+  ]
+}

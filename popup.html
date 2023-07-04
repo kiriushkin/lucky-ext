@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="style_parser.js" defer></script>
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h3>Handy Shtuchka</h3>
+
+      <div class="menus">
+        <div class="menu menu_main" data-menu="main">
+          <div class="menu__container">
+            <div class="menu__item" data-target="tails">
+              <p>Tails</p>
+              <img class="menu__item-icon" src="icons/question.svg" />
+            </div>
+            <div class="menu__item" data-target="form">
+              <p>Form</p>
+              <img class="menu__item-icon" src="icons/form.svg" />
+            </div>
+          </div>
+        </div>
+
+        <div class="menu menu_hide" data-menu="tails">
+          <img class="menu__back" src="icons/back.svg" />
+          <div class="menu__container">
+            <div class="menu__item menu__item_add">
+              <p>Add new +</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu menu_hide" data-menu="form">
+          <img class="menu__back" src="icons/back.svg" />
+          <div class="menu__container">
+            <div class="menu__text">Name Field</div>
+            <div class="menu__subcontainer" data-subcontainer="name"></div>
+
+            <div class="menu__text">Phone Field</div>
+            <div class="menu__subcontainer" data-subcontainer="phone"></div>
+
+            <div class="menu__text">Submit Button</div>
+            <div class="menu__subcontainer" data-subcontainer="submit"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
