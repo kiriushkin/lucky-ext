@@ -102,17 +102,22 @@
   );
 
   const firstLine = lines[0].trim();
-  const lastLink = links[links.length - 1].trim();
+  const lastLink =
+    links.length > 0
+      ? links[links.length - 1]
+        ? links[links.length - 1].trim()
+        : links[0].trim()
+      : '';
 
   const [devLink] = firstLine.match(/^.+\.[a-z]+/);
-  const [prodLink] = lastLink.match(/https:\/\/[a-z0-9]+\.[a-z]+/);
+  const [prodLink] = lastLink
+    ? lastLink.match(/https:\/\/[a-z0-9]+\.[a-z]+/)
+    : '';
 
   const path1 = isMac ? devLink : devLink.replace(/_[a-z]{2}/, '');
   const path2 = firstLine.replace(devLink, '');
 
-  const prodDomain = prodLink.replace('https://', '');
-
-  console.log(prodDomain);
+  const prodDomain = prodLink ? prodLink.replace('https://', '') : '';
 
   const [devDomain] = path1.match(/[a-z]+-[a-z]+.[a-z]+/);
 
@@ -120,7 +125,11 @@
     ? `shortcuts://run-shortcut?name=Lucky&input=path1=${path1}+path2=${path2}`
     : `lucky://path1=${path1}&path2=${path2}`;
 
-  lines[0] = `${lines[0]} <a href="${href}" class="open-link">⬆️</a> <a target="_blank" href="https://lt-tracker.pro/cloudflare/domains?q=${devDomain}&blank=${prodDomain}">🔁</a>`;
+  lines[0] = `${
+    lines[0]
+  } <a href="${href}" class="open-link">⬆️</a> <a target="_blank" href="https://lt-tracker.pro/cloudflare/domains?q=${devDomain}${
+    prodDomain ? '&blank = ' + prodDomain : ''
+  }">🔁</a>`;
 
   linksBox.innerHTML = lines.join('<br>');
 })();
