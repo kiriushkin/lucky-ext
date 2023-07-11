@@ -128,7 +128,7 @@
   lines[0] = `${
     lines[0]
   } <a href="${href}" class="open-link">⬆️</a> <a target="_blank" href="https://lt-tracker.pro/cloudflare/domains?q=${devDomain}${
-    prodDomain ? '&blank = ' + prodDomain : ''
+    prodDomain ? '&blank=' + prodDomain : ''
   }">🔁</a>`;
 
   linksBox.innerHTML = lines.join('<br>');
