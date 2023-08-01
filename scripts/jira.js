@@ -53,6 +53,7 @@
   top: -5px;
   right: -65px;
   padding: 5px;
+  pointer-events: none;
 
   width: 50px;
 
