@@ -34,6 +34,41 @@
 .open-link {
   text-decoration: none;
 }
+
+.copiable {
+  position: relative;
+  cursor: pointer;
+  border-bottom: 1px dashed #0052cc;
+  margin: 0;
+}
+
+.copiable:hover {
+  color: #0052cc;
+}
+
+.copiable::before {
+  content: 'Copied';
+
+  position: absolute;
+  top: -5px;
+  right: -65px;
+  padding: 5px;
+
+  width: 50px;
+
+  text-align: center;
+
+  border-radius: 5px;
+  background-color: #33333333;
+
+  opacity: 0;
+  transition: .3s;
+  color: #fff;
+}
+
+.copiable.copied::before {
+  opacity: 1;
+}
 `;
 
   const style = document.createElement('style');
@@ -46,10 +81,14 @@
   if (!block) return;
 
   const els = [];
+  const newEls = [];
 
   block.querySelectorAll('p').forEach((el) => {
     if (el.textContent.includes(' - ') && !el.innerHTML.includes('<a'))
       els.push(el);
+
+    if (el.textContent.includes('—') && !el.innerHTML.includes('<a'))
+      newEls.push(el);
   });
 
   els.forEach((el) => {
@@ -73,6 +112,42 @@
     el.innerHTML = newLines.join('<br>');
   });
 
+  newEls.forEach((el) => {
+    const lines = el.innerHTML.split('<br>');
+
+    const pairs = lines.map((line) => line.split('—'));
+
+    const newLines = pairs.map((pair) => {
+      let value = pair[1].trim().replaceAll('&nbsp;', '');
+
+      if (!value) return pair[0];
+
+      if (value.includes('=') && value.includes(',')) {
+        const values = value.match(/= [a-zA-Z0-9]+/g);
+
+        values.forEach((val) => {
+          val = val.replace('= ', '');
+
+          const copiable = document.createElement('span');
+          copiable.innerText = val;
+          copiable.classList.add('copiable');
+
+          value = value.replace(val, copiable.outerHTML);
+        });
+
+        return pair[0] + '—&nbsp;' + value;
+      } else {
+        const copiable = document.createElement('span');
+        copiable.innerText = value;
+        copiable.classList.add('copiable');
+
+        return pair[0] + '—&nbsp;' + copiable.outerHTML;
+      }
+    });
+
+    el.innerHTML = newLines.join('<br>');
+  });
+
   document.querySelectorAll('.copy-btn').forEach(
     (btn) =>
       (btn.onclick = (e) => {
@@ -83,6 +158,20 @@
 
         setTimeout(() => {
           btn.classList.remove('copied');
+        }, 1000);
+      })
+  );
+
+  document.querySelectorAll('.copiable').forEach(
+    (el) =>
+      (el.onclick = (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(el.innerText);
+
+        el.classList.add('copied');
+
+        setTimeout(() => {
+          el.classList.remove('copied');
         }, 1000);
       })
   );
