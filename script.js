@@ -360,6 +360,8 @@ function appendSettings(settings) {
 }
 
 async function migrateFromLocalStorage() {
+  if ((await chrome.storage.sync.get('tails'))?.tails?.length > 0) return;
+
   const tails = JSON.parse(localStorage.getItem('tails'));
   await chrome.storage.sync.set({ tails });
 }
