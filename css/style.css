@@ -152,6 +152,10 @@ h3 {
   transition: 0.3s;
 }
 
+.menu__item_fs {
+  justify-content: flex-start;
+}
+
 .menu__item p {
   width: fit-content;
   position: relative;

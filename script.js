@@ -1,4 +1,5 @@
 loadTails();
+loadSettings();
 getFormData();
 
 const DEFAULT_TITLE = 'Handy Shtuchka';
@@ -47,23 +48,25 @@ tailsAddBtn.addEventListener('click', () => {
   addTail(name, tail);
 });
 
-function loadTails() {
-  if (!localStorage.getItem('tails'))
-    return localStorage.setItem('tails', '[]');
+async function loadTails() {
+  await migrateFromLocalStorage();
 
-  const tails = JSON.parse(localStorage.getItem('tails'));
+  if (!(await chrome.storage.sync.get('tails'))?.tails?.length > 0)
+    return await chrome.storage.sync.set({ tails: [] });
+
+  const { tails } = await chrome.storage.sync.get('tails');
 
   tails.forEach((item) => {
     appendTail(item);
   });
 }
 
-function addTail(name, tail) {
-  const tails = JSON.parse(localStorage.getItem('tails'));
+async function addTail(name, tail) {
+  const { tails } = await chrome.storage.sync.get('tails');
 
   tails.push({ name, tail });
 
-  localStorage.setItem('tails', JSON.stringify(tails));
+  await chrome.storage.sync.set({ tails });
 
   appendTail({ name, tail }, false);
 }
@@ -124,8 +127,8 @@ function appendTail(item, first = true) {
   return el;
 }
 
-function editTail(tail) {
-  const tails = JSON.parse(localStorage.getItem('tails'));
+async function editTail(tail) {
+  const { tails } = await chrome.storage.sync.get('tails');
   const item = tails.find((item) => item.tail === tail);
 
   const newName = prompt('Name:', item.name);
@@ -135,7 +138,7 @@ function editTail(tail) {
 
   tails[index] = { name: newName, tail: newTail };
 
-  localStorage.setItem('tails', JSON.stringify(tails));
+  await chrome.storage.sync.set({ tails });
 
   const tailEl = document.querySelector(`[data-tail="${tail}"]`);
 
@@ -143,145 +146,220 @@ function editTail(tail) {
   tailEl.dataset.tail = newTail;
 }
 
-function deleteTail(tail) {
-  const tails = JSON.parse(localStorage.getItem('tails'));
+async function deleteTail(tail) {
+  const { tails } = await chrome.storage.sync.get('tails');
   const newTails = tails.filter((item) => item.tail !== tail);
 
-  localStorage.setItem('tails', JSON.stringify(newTails));
+  await chrome.storage.sync.set({ tails: newTails });
 
   document.querySelector(`[data-tail="${tail}"]`).remove();
 }
 
 async function getFormData() {
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true,
-  });
-
-  const data = await chrome.tabs.sendMessage(tab.id, 'get_form_data');
-
-  const formMenu = document.querySelector(
-    '[data-menu="form"] .menu__container'
-  );
-
-  const nameContainer = formMenu.querySelector('[data-subcontainer="name"]');
-  const phoneContainer = formMenu.querySelector('[data-subcontainer="phone"]');
-  const submitContainer = formMenu.querySelector(
-    '[data-subcontainer="submit"]'
-  );
-
-  if (data.name) {
-    const minLength = document.createElement('div');
-    minLength.classList.add('menu__subtext');
-    minLength.innerText = `Min Length: `;
-
-    let value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.name.minLength;
-
-    minLength.appendChild(value);
-
-    const required = document.createElement('div');
-    required.classList.add('menu__subtext');
-    required.innerText = `Empty Is Not Allowed: `;
-
-    value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.name.required;
-
-    required.appendChild(value);
-
-    nameContainer.appendChild(minLength);
-    nameContainer.appendChild(required);
-  } else {
-    const text = document.createElement('div');
-    text.classList.add('menu__subtext');
-    text.innerText = `Field not found`;
-
-    nameContainer.appendChild(text);
-  }
-
-  if (data.phone) {
-    const minLength = document.createElement('div');
-    minLength.classList.add('menu__subtext');
-    minLength.innerText = `Min Length: `;
-
-    let value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.phone.minLength;
-
-    minLength.appendChild(value);
-
-    const maxLength = document.createElement('div');
-    maxLength.classList.add('menu__subtext');
-    maxLength.innerText = `Max Length: `;
-
-    value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.phone.maxLength;
-
-    maxLength.appendChild(value);
-
-    const required = document.createElement('div');
-    required.classList.add('menu__subtext');
-    required.innerText = `Empty Is Not Allowed: `;
-
-    value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.phone.required;
-
-    required.appendChild(value);
-
-    const digital = document.createElement('div');
-    digital.classList.add('menu__subtext');
-    digital.innerText = `Digital Keyboard: `;
-
-    value = document.createElement('span');
-    value.classList.add('menu__subtext_highlight');
-    value.innerText = data.phone.type == 'tel';
-
-    digital.appendChild(value);
-
-    phoneContainer.appendChild(minLength);
-    phoneContainer.appendChild(maxLength);
-    phoneContainer.appendChild(required);
-    phoneContainer.appendChild(digital);
-  } else {
-    const text = document.createElement('div');
-    text.classList.add('menu__subtext');
-    text.innerText = `Field not found`;
-
-    phoneContainer.appendChild(text);
-  }
-
-  if (data.submit) {
-    const text = document.createElement('div');
-    text.classList.add('menu__subtext');
-    text.innerText = `Button is available`;
-
-    submitContainer.appendChild(text);
-
-    const submitBtn = document.createElement('div');
-    submitBtn.classList.add('menu__item');
-
-    const p = document.createElement('p');
-    p.innerText = 'Send Form';
-
-    submitBtn.appendChild(p);
-
-    submitBtn.addEventListener('click', async () => {
-      const name = prompt('Name:', 'test');
-      const tel = prompt('Phone:', '');
-
-      await chrome.tabs.sendMessage(tab.id, `send_form ${name} ${tel}`);
+  try {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
     });
 
-    formMenu.appendChild(submitBtn);
-  } else {
-    const text = document.createElement('div');
-    text.classList.add('menu__subtext');
-    text.innerText = `Button not found`;
+    const data = await chrome.tabs.sendMessage(tab.id, 'get_form_data');
 
-    submitContainer.appendChild(text);
-  }
+    const formMenu = document.querySelector(
+      '[data-menu="form"] .menu__container'
+    );
+
+    const nameContainer = formMenu.querySelector('[data-subcontainer="name"]');
+    const phoneContainer = formMenu.querySelector(
+      '[data-subcontainer="phone"]'
+    );
+    const submitContainer = formMenu.querySelector(
+      '[data-subcontainer="submit"]'
+    );
+
+    if (data.name) {
+      const minLength = document.createElement('div');
+      minLength.classList.add('menu__subtext');
+      minLength.innerText = `Min Length: `;
+
+      let value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.name.minLength;
+
+      minLength.appendChild(value);
+
+      const required = document.createElement('div');
+      required.classList.add('menu__subtext');
+      required.innerText = `Empty Is Not Allowed: `;
+
+      value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.name.required;
+
+      required.appendChild(value);
+
+      nameContainer.appendChild(minLength);
+      nameContainer.appendChild(required);
+    } else {
+      const text = document.createElement('div');
+      text.classList.add('menu__subtext');
+      text.innerText = `Field not found`;
+
+      nameContainer.appendChild(text);
+    }
+
+    if (data.phone) {
+      const minLength = document.createElement('div');
+      minLength.classList.add('menu__subtext');
+      minLength.innerText = `Min Length: `;
+
+      let value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.phone.minLength;
+
+      minLength.appendChild(value);
+
+      const maxLength = document.createElement('div');
+      maxLength.classList.add('menu__subtext');
+      maxLength.innerText = `Max Length: `;
+
+      value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.phone.maxLength;
+
+      maxLength.appendChild(value);
+
+      const required = document.createElement('div');
+      required.classList.add('menu__subtext');
+      required.innerText = `Empty Is Not Allowed: `;
+
+      value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.phone.required;
+
+      required.appendChild(value);
+
+      const digital = document.createElement('div');
+      digital.classList.add('menu__subtext');
+      digital.innerText = `Digital Keyboard: `;
+
+      value = document.createElement('span');
+      value.classList.add('menu__subtext_highlight');
+      value.innerText = data.phone.type == 'tel';
+
+      digital.appendChild(value);
+
+      phoneContainer.appendChild(minLength);
+      phoneContainer.appendChild(maxLength);
+      phoneContainer.appendChild(required);
+      phoneContainer.appendChild(digital);
+    } else {
+      const text = document.createElement('div');
+      text.classList.add('menu__subtext');
+      text.innerText = `Field not found`;
+
+      phoneContainer.appendChild(text);
+    }
+
+    if (data.submit) {
+      const text = document.createElement('div');
+      text.classList.add('menu__subtext');
+      text.innerText = `Button is available`;
+
+      submitContainer.appendChild(text);
+
+      const submitBtn = document.createElement('div');
+      submitBtn.classList.add('menu__item');
+
+      const p = document.createElement('p');
+      p.innerText = 'Send Form';
+
+      submitBtn.appendChild(p);
+
+      submitBtn.addEventListener('click', async () => {
+        const name = prompt('Name:', 'test');
+        const tel = prompt('Phone:', '');
+
+        await chrome.tabs.sendMessage(tab.id, `send_form ${name} ${tel}`);
+      });
+
+      formMenu.appendChild(submitBtn);
+    } else {
+      const text = document.createElement('div');
+      text.classList.add('menu__subtext');
+      text.innerText = `Button not found`;
+
+      submitContainer.appendChild(text);
+    }
+  } catch (error) {}
+}
+
+async function loadSettings() {
+  if (!(await chrome.storage.sync.get('settings'))?.settings)
+    await chrome.storage.sync.set({
+      settings: {
+        pullAndOpenFeature: {
+          title: 'Pull&Open Feature',
+          type: 'checkbox',
+          value: false,
+        },
+        clearCacheFeature: {
+          title: 'Clear Cache Feature',
+          type: 'checkbox',
+          value: false,
+        },
+      },
+    });
+
+  const { settings } = await chrome.storage.sync.get('settings');
+
+  appendSettings(settings);
+}
+
+function appendSettings(settings) {
+  const settingsMenu = document.querySelector(
+    '[data-menu="settings"] .menu__container'
+  );
+
+  Object.entries(settings).forEach(([key, value]) => {
+    const item = document.createElement('div');
+    item.classList.add('menu__item');
+    item.classList.add('menu__item_fs');
+
+    const element = document.createElement('input');
+    element.id = key;
+    element.setAttribute('type', value.type);
+    if (value.type === 'checkbox') element.checked = value.value;
+
+    element.addEventListener('change', async () => {
+      const { settings } = await chrome.storage.sync.get('settings');
+
+      const newSettings = {
+        ...settings,
+        [key]: {
+          ...value,
+          value: element.type === 'checkbox' ? element.checked : element.value,
+        },
+      };
+
+      await chrome.storage.sync.set({ settings: newSettings });
+
+      console.log(await chrome.storage.sync.get('settings'));
+    });
+
+    item.appendChild(element);
+
+    if (value.type === 'checkbox') {
+      const label = document.createElement('label');
+      label.innerText = value.title;
+      label.setAttribute('for', key);
+      item.appendChild(label);
+    }
+
+    settingsMenu.appendChild(item);
+  });
+}
+
+async function migrateFromLocalStorage() {
+  const tails = JSON.parse(localStorage.getItem('tails'));
+  await chrome.storage.sync.set({ tails });
 }

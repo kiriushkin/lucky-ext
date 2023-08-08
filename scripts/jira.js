@@ -178,7 +178,9 @@
   );
 })();
 
-(() => {
+(async () => {
+  const { settings } = await chrome.storage.sync.get('settings');
+
   const linksBox = document.querySelector('.flooded');
 
   if (!linksBox) return;
@@ -191,13 +193,21 @@
     line.match(/https:\/\/[a-z0-9]+\.[a-z]+/)
   );
 
-  const firstLine = lines[0].trim();
+  let firstLine = lines[0].trim();
   const lastLink =
     links.length > 0
       ? links[links.length - 1]
         ? links[links.length - 1].trim()
         : links[0].trim()
       : '';
+
+  if (!firstLine.match(/^.+\.[a-z]+/)) {
+    console.log(lines, firstLine);
+    const [code] = lines[1].trim().match(/^[a-z]+/);
+    firstLine = firstLine.match(new RegExp(`${code}/$`))
+      ? firstLine + lines[1].trim()
+      : firstLine;
+  }
 
   const [devLink] = firstLine.match(/^.+\.[a-z]+/);
   const [prodLink] = lastLink
@@ -215,11 +225,17 @@
     ? `shortcuts://run-shortcut?name=Lucky&input=path1=${path1}+path2=${path2}`
     : `lucky://path1=${path1}&path2=${path2}`;
 
-  lines[0] = `${
-    lines[0]
-  } <a href="${href}" class="open-link">⬆️</a> <a target="_blank" href="https://lt-tracker.pro/cloudflare/domains?q=${devDomain}${
+  const pullLine = `<a href="${href}" class="open-link">⬆️</a>`;
+  const cacheLine = `<a target="_blank" href="https://lt-tracker.pro/cloudflare/domains?q=${devDomain}${
     prodDomain ? '&blank=' + prodDomain : ''
   }">🔁</a>`;
+
+  const { pullAndOpenFeature: pullFeature, clearCacheFeature: cacheFeature } =
+    settings;
+
+  lines[0] = `${lines[0]} ${pullFeature.value ? pullLine : ''} ${
+    cacheFeature.value ? cacheLine : ''
+  }`;
 
   linksBox.innerHTML = lines.join('<br>');
 })();
