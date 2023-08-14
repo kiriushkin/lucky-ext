@@ -189,11 +189,16 @@
 
   const lines = linksBox.innerHTML.split('<br>');
 
+  lines.map((line) => line.replace('\\', '/'));
+
   const links = lines.filter((line) =>
     line.match(/https:\/\/[a-z0-9]+\.[a-z]+/)
   );
 
   let firstLine = lines[0].trim();
+
+  firstLine = firstLine.replace(/\\/g, '/');
+
   const lastLink =
     links.length > 0
       ? links[links.length - 1]
