@@ -9,6 +9,24 @@ const header = document.querySelector('h3');
 
 let isCtrl = false;
 
+const DEFAULT_SETTINGS = {
+  pullAndOpenFeature: {
+    title: 'Pull&Open Feature',
+    type: 'checkbox',
+    value: false,
+  },
+  clearCacheFeature: {
+    title: 'Clear Cache Feature',
+    type: 'checkbox',
+    value: false,
+  },
+  underscoreInReposPath: {
+    title: 'Underscore In Repos Path',
+    type: 'checkbox',
+    value: false,
+  },
+};
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Control') isCtrl = true;
 });
@@ -295,22 +313,17 @@ async function getFormData() {
 
 async function loadSettings() {
   if (!(await chrome.storage.sync.get('settings'))?.settings)
-    await chrome.storage.sync.set({
-      settings: {
-        pullAndOpenFeature: {
-          title: 'Pull&Open Feature',
-          type: 'checkbox',
-          value: false,
-        },
-        clearCacheFeature: {
-          title: 'Clear Cache Feature',
-          type: 'checkbox',
-          value: false,
-        },
-      },
-    });
+    await chrome.storage.sync.set({ settings: DEFAULT_SETTINGS });
 
   const { settings } = await chrome.storage.sync.get('settings');
+
+  console.log(settings);
+
+  const keys = Object.keys(DEFAULT_SETTINGS);
+
+  keys.forEach((key) => {
+    if (!settings[key]) settings[key] = DEFAULT_SETTINGS[key];
+  });
 
   appendSettings(settings);
 }

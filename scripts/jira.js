@@ -219,7 +219,10 @@
     ? lastLink.match(/https:\/\/[a-z0-9]+\.[a-z]+/)
     : '';
 
-  const path1 = isMac ? devLink : devLink.replace(/_[a-z]{2}/, '');
+  const path1 =
+    isMac || settings.underscoreInReposPath.value
+      ? devLink
+      : devLink.replace(/_[a-z]{2}/, '');
   const path2 = firstLine.replace(devLink, '');
 
   const prodDomain = prodLink ? prodLink.replace('https://', '') : '';
