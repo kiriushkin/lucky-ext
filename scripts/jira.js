@@ -119,7 +119,7 @@
     const pairs = lines.map((line) => line.split('—'));
 
     const newLines = pairs.map((pair) => {
-      let value = pair[1].trim().replaceAll('&nbsp;', '');
+      let value = pair[1]?.trim().replaceAll('&nbsp;', '');
 
       if (!value) return pair[0];
 
