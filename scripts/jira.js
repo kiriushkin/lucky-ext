@@ -124,7 +124,7 @@
       if (!value) return pair[0];
 
       if (value.includes('=') && value.includes(',')) {
-        const values = value.match(/= [a-zA-Z0-9]+/g);
+        const values = value.match(/= [a-zA-Z0-9\-]+/g);
 
         values.forEach((val) => {
           val = val.replace('= ', '');
