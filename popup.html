@@ -1,81 +1,137 @@
 <html>
 
 <head>
-  <link rel="stylesheet"
-        href="css/style.css" />
-  <script src="script.js"
-          defer></script>
+     <link rel="stylesheet"
+           href="css/style.css" />
+     <script src="script.js"
+             defer
+             type="module"></script>
 </head>
 
 <body>
-  <div class="container">
-    <h3>Handy Shtuchka</h3>
+     <div class="container">
+          <h3>Handy Shtuchka</h3>
 
-    <div class="menus">
-      <div class="menu menu_main"
-           data-menu="main">
-        <div class="menu__container">
-          <div class="menu__item"
-               data-target="tails">
-            <p>Tails</p>
-            <img class="menu__item-icon"
-                 src="icons/question.svg" />
+          <div class="menus">
+               <div class="menu menu_main"
+                    data-menu="main">
+                    <div class="menu__container">
+                         <div class="menu__item"
+                              data-target="tails">
+                              <p>Tails</p>
+                              <img class="menu__item-icon"
+                                   src="icons/question.svg" />
+                         </div>
+                         <div class="menu__item"
+                              data-target="dates">
+                              <p>Dates</p>
+                              <img class="menu__item-icon"
+                                   src="icons/date.svg" />
+                         </div>
+                         <div class="menu__item"
+                              data-target="form">
+                              <p>Form</p>
+                              <img class="menu__item-icon"
+                                   src="icons/form.svg" />
+                         </div>
+                         <div class="menu__item"
+                              data-target="settings">
+                              <p>Settings</p>
+                              <img class="menu__item-icon"
+                                   src="icons/settings.svg" />
+                         </div>
+                    </div>
+               </div>
+
+               <div class="menu menu_hide"
+                    data-menu="tails">
+                    <img class="menu__back"
+                         src="icons/back.svg" />
+                    <div class="menu__container">
+                         <div class="menu__item menu__item_add">
+                              <p>Add new +</p>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="menu menu_hide"
+                    data-menu="dates">
+                    <img class="menu__back"
+                         src="icons/back.svg" />
+                    <div class="menu__container">
+
+                         <div class="menu__item">
+                              <select name=""
+                                      id="langs-list">
+                              </select>
+                         </div>
+
+                         <div class="menu__item">
+                              <select name=""
+                                      id="format-list">
+                                   <option value="short">Short</option>
+                                   <option value="long">Long</option>
+                                   <option value="full">Full</option>
+                                   <option value="weekday">Weekday</option>
+                                   <option value="day">Day</option>
+                                   <option value="month">Month</option>
+                                   <option value="year">Year</option>
+                              </select>
+                         </div>
+
+                         <div class="menu__item">
+                              <div class="menu__text">Days</div>
+                         </div>
+
+                         <div class="menu__item">
+                              <input type="number"
+                                     value="0"
+                                     id="days">
+                         </div>
+
+                         <div class="menu__item">
+                              <div class="menu__text">Months</div>
+                         </div>
+
+                         <div class="menu__item"><input type="number"
+                                     value="0"
+                                     id="months"></div>
+
+                         <div class="menu__item">
+                              <code id="date-code"></code>
+                         </div>
+                    </div>
+               </div>
+
+               <div class="menu menu_hide"
+                    data-menu="form">
+                    <img class="menu__back"
+                         src="icons/back.svg" />
+                    <div class="menu__container">
+                         <div class="menu__text">Name Field</div>
+                         <div class="menu__subcontainer"
+                              data-subcontainer="name"></div>
+
+                         <div class="menu__text">Phone Field</div>
+                         <div class="menu__subcontainer"
+                              data-subcontainer="phone"></div>
+
+                         <div class="menu__text">Submit Button</div>
+                         <div class="menu__subcontainer"
+                              data-subcontainer="submit"></div>
+                    </div>
+               </div>
+
+               <div class="menu menu_hide"
+                    data-menu="settings">
+                    <img class="menu__back"
+                         src="icons/back.svg" />
+                    <div class="menu__container">
+
+                    </div>
+               </div>
           </div>
-          <div class="menu__item"
-               data-target="form">
-            <p>Form</p>
-            <img class="menu__item-icon"
-                 src="icons/form.svg" />
-          </div>
-          <div class="menu__item"
-               data-target="settings">
-            <p>Settings</p>
-            <img class="menu__item-icon"
-                 src="icons/settings.svg" />
-          </div>
-        </div>
-      </div>
-
-      <div class="menu menu_hide"
-           data-menu="tails">
-        <img class="menu__back"
-             src="icons/back.svg" />
-        <div class="menu__container">
-          <div class="menu__item menu__item_add">
-            <p>Add new +</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="menu menu_hide"
-           data-menu="form">
-        <img class="menu__back"
-             src="icons/back.svg" />
-        <div class="menu__container">
-          <div class="menu__text">Name Field</div>
-          <div class="menu__subcontainer"
-               data-subcontainer="name"></div>
-
-          <div class="menu__text">Phone Field</div>
-          <div class="menu__subcontainer"
-               data-subcontainer="phone"></div>
-
-          <div class="menu__text">Submit Button</div>
-          <div class="menu__subcontainer"
-               data-subcontainer="submit"></div>
-        </div>
-      </div>
-
-      <div class="menu menu_hide"
-           data-menu="settings">
-        <img class="menu__back"
-             src="icons/back.svg" />
-        <div class="menu__container">
-
-        </div>
-      </div>
-    </div>
-  </div>
+     </div>
 </body>
 
 </html>

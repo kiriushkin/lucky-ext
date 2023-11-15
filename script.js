@@ -1,4 +1,7 @@
+import langs from './languages.mjs';
+
 loadTails();
+loadLangs();
 loadSettings();
 getFormData();
 
@@ -171,6 +174,92 @@ async function deleteTail(tail) {
   await chrome.storage.sync.set({ tails: newTails });
 
   document.querySelector(`[data-tail="${tail}"]`).remove();
+}
+
+async function loadLangs() {
+  const select = document.querySelector('#langs-list');
+  langs.forEach((_) => {
+    const option = document.createElement('option');
+    option.value = _.code;
+    option.textContent = _.language;
+
+    select.appendChild(option);
+  });
+
+  const days = document.querySelector('#days');
+  const months = document.querySelector('#months');
+  const format = document.querySelector('#format-list');
+
+  select.addEventListener('change', generateDateCode);
+  days.addEventListener('change', generateDateCode);
+  months.addEventListener('change', generateDateCode);
+  format.addEventListener('change', generateDateCode);
+
+  try {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    const data = await chrome.tabs.sendMessage(tab.id, 'get_lang');
+
+    if (data) select.querySelector(`[value="${data}"]`).selected = true;
+
+    console.log(data);
+
+    generateDateCode();
+  } catch (error) {
+    console.log(error);
+    generateDateCode();
+  }
+
+  const code = document.querySelector('#date-code');
+  code.addEventListener('click', (e) => {
+    navigator.clipboard.writeText(e.target.textContent);
+    e.target.classList.toggle('highlighted');
+    setTimeout(() => {
+      e.target.classList.toggle('highlighted');
+    }, 1000);
+  });
+}
+
+function generateDateCode() {
+  const select = document.querySelector('#langs-list').value;
+  const days = document.querySelector('#days').value;
+  const months = document.querySelector('#months').value;
+  const format = document.querySelector('#format-list').value;
+
+  let daysText = '';
+  let monthsText = '';
+
+  if (days !== 0)
+    daysText = `let d = new Date();d.setDate(d.getDate() + ${days});`;
+
+  if (daysText && months !== 0)
+    monthsText = `d.setMonth(d.getMonth() + ${months});`;
+  else if (!daysText && months !== 0)
+    monthsText = `let d = new Date();d.setMonth(d.getMonth() + ${months});`;
+
+  const config = {
+    dateStyle:
+      format === 'short' || format === 'long' || format === 'full'
+        ? format
+        : undefined,
+    month: format === 'month' ? 'long' : undefined,
+    year: format === 'year' ? 'numeric' : undefined,
+    day: format === 'day' ? 'numeric' : undefined,
+    weekday: format === 'weekday' ? 'long' : undefined,
+  };
+
+  const scriptText = `(() => {${daysText}${monthsText}document.write(${
+    daysText || monthsText ? 'd' : '(new Date())'
+  }.toLocaleDateString('${select}', ${JSON.stringify(config)}))})();`;
+  const scriptEl = document.createElement('script');
+
+  scriptEl.innerText = scriptText;
+
+  const codeEl = document.querySelector('#date-code');
+  codeEl.textContent = scriptEl.outerHTML;
 }
 
 async function getFormData() {

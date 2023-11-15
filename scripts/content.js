@@ -24,6 +24,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse(data);
   }
 
+  if (msg === 'get_lang') {
+    const lang = document.documentElement.lang;
+    sendResponse(lang);
+  }
+
   if (msg.match('send_form')) {
     const [cmd, name, tel] = msg.split(' ');
 
