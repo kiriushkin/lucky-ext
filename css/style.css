@@ -157,7 +157,7 @@ h3 {
 }
 
 .menu__container select,
-.menu__container input {
+.menu__container input[type='number'] {
   padding: 5px 10px;
   width: 100%;
 
