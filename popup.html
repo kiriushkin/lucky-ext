@@ -35,6 +35,12 @@
                                    src="icons/form.svg" />
                          </div>
                          <div class="menu__item"
+                              data-target="run">
+                              <p>Run</p>
+                              <img class="menu__item-icon"
+                                   src="icons/terminal.svg" />
+                         </div>
+                         <div class="menu__item"
                               data-target="settings">
                               <p>Settings</p>
                               <img class="menu__item-icon"
@@ -119,6 +125,22 @@
                          <div class="menu__text">Submit Button</div>
                          <div class="menu__subcontainer"
                               data-subcontainer="submit"></div>
+                    </div>
+               </div>
+
+               <div class="menu menu_hide"
+                    data-menu="run">
+                    <img class="menu__back"
+                         src="icons/back.svg" />
+                    <div class="menu__container">
+                         <div class="menu__item">
+                              <input type="text"
+                                     value=""
+                                     id="command"
+                                     placeholder="Enter your command...">
+                         </div>
+                         <div class="menu__text error"
+                              style="display: none;"></div>
                     </div>
                </div>
 

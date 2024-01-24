@@ -1,3 +1,4 @@
+import './scripts/run-handler.js';
 import langs from './languages.mjs';
 
 loadTails();

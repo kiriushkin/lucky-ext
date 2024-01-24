@@ -32,6 +32,10 @@
   color: var(--white);
 }
 
+*:focus {
+  outline-color: var(--main-color);
+}
+
 body {
   background-color: var(--black);
 }
@@ -40,6 +44,10 @@ h3 {
   text-align: center;
   font-size: 26px;
   text-transform: capitalize;
+}
+
+.error {
+  color: var(--comp-red-color);
 }
 
 .container {
@@ -157,6 +165,7 @@ h3 {
 }
 
 .menu__container select,
+.menu__container input[type='text'],
 .menu__container input[type='number'] {
   padding: 5px 10px;
   width: 100%;
@@ -164,6 +173,10 @@ h3 {
   background-color: var(--black);
   border: 1px solid var(--gray);
   border-radius: 10px;
+}
+
+.menu__container input[type='text']#command {
+  font-family: monospace;
 }
 
 .menu__container code {
