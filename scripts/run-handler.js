@@ -41,8 +41,8 @@ input.addEventListener('keydown', (e) => {
 
     const path1 =
       isMac || settings.underscoreInReposPath.value
-        ? domain
-        : domain.replace(/_[a-z]{2}/, '');
+        ? domain[0]
+        : domain[0].replace(/_[a-z]{2}/, '');
     const path2 = link.replace(domain, '');
 
     // return throwError(path1 + '\n' + path2);
