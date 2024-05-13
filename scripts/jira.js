@@ -238,12 +238,19 @@
     prodDomain ? '&blank=' + prodDomain : ''
   }">🔁</a>`;
 
-  const { pullAndOpenFeature: pullFeature, clearCacheFeature: cacheFeature } =
-    settings;
+  const localhostLine = `<a href="http://localhost/${
+    path1 + path2
+  }" target="_blank">🚮</a>`;
+
+  const {
+    pullAndOpenFeature: pullFeature,
+    clearCacheFeature: cacheFeature,
+    localHostLink: localLink,
+  } = settings;
 
   lines[0] = `${lines[0]} ${pullFeature.value ? pullLine : ''} ${
     cacheFeature.value ? cacheLine : ''
-  }`;
+  } ${localLink.value ? localhostLine : ''}`;
 
   linksBox.innerHTML = lines.join('<br>');
 })();

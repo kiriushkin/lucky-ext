@@ -24,6 +24,11 @@ const DEFAULT_SETTINGS = {
     type: 'checkbox',
     value: false,
   },
+  localHostLink: {
+    title: 'Localhost Link',
+    type: 'checkbox',
+    value: false,
+  },
   underscoreInReposPath: {
     title: 'Underscore In Repos Path',
     type: 'checkbox',
